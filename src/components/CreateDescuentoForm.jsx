@@ -1,91 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function CreateDescuentoForm() {
-  const [tipo, setTipo] = useState('compra');
-  const [producto, setProducto] = useState('');
-  const [tarjeta, setTarjeta] = useState('');
+function CreateDescuentoForm({ onDescuentoCreated }) {
+  const [tipoDescuento, setTipoDescuento] = useState('');
+  const [porcentaje, setPorcentaje] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
-  const [porcentaje, setPorcentaje] = useState('');
+  const [productoOTarjeta, setProductoOTarjeta] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = tipo === 'compra' 
-        ? `http://localhost:8080/descuentos/crear/compra/${producto}`
-        : `http://localhost:8080/descuentos/crear/producto/${tarjeta}`;
-      
+      const descuentoData = {
+        fechaInicio,
+        fechaFin,
+        porcentaje: parseFloat(porcentaje),
+        descripcion: productoOTarjeta,
+      };
+
+      let url = '';
+      if (tipoDescuento === 'PRODUCTO') {
+        url = `http://localhost:8080/descuentos/crear/compra/${productoOTarjeta}`;
+      } else if (tipoDescuento === 'COMPRA') {
+        url = `http://localhost:8080/descuentos/crear/producto/${productoOTarjeta}`;
+      } else {
+        throw new Error('Tipo de descuento no válido');
+      }
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          fechaInicio,
-          fechaFin,
-          porcentaje: parseFloat(porcentaje)
-        }),
+        body: JSON.stringify(descuentoData),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al crear el descuento');
-      }
+      if (!response.ok) throw new Error('Error al crear el descuento');
 
       const data = await response.text();
       setMessage(data);
-      // Limpiar el formulario
-      setProducto('');
-      setTarjeta('');
+      setPorcentaje('');
       setFechaInicio('');
       setFechaFin('');
-      setPorcentaje('');
+      setProductoOTarjeta('');
+      setTipoDescuento('');
+      onDescuentoCreated();
     } catch (error) {
       setMessage('Error: ' + error.message);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Crear Descuento</h2>
+    <div className="bg-gray-50 p-4 rounded-md p-6">
+      <h3 className="text-lg font-medium mb-4">Crear Descuento</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">Tipo de Descuento:</label>
+          <label htmlFor="tipoDescuento" className="block text-sm font-medium text-gray-700">Tipo de Descuento:</label>
           <select
-            id="tipo"
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            id="tipoDescuento"
+            value={tipoDescuento}
+            onChange={(e) => setTipoDescuento(e.target.value)}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           >
-            <option value="compra">Descuento por Compra</option>
-            <option value="producto">Descuento por Producto</option>
+            <option value="">Seleccione un tipo</option>
+            <option value="PRODUCTO">Por Producto</option>
+            <option value="COMPRA">Por Compra</option>
           </select>
         </div>
-        {tipo === 'compra' ? (
-          <div>
-            <label htmlFor="producto" className="block text-sm font-medium text-gray-700">Producto:</label>
-            <input
-              type="text"
-              id="producto"
-              value={producto}
-              onChange={(e) => setProducto(e.target.value)}
-              required
-              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        ) : (
-          <div>
-            <label htmlFor="tarjeta" className="block text-sm font-medium text-gray-700">Tarjeta:</label>
-            <input
-              type="text"
-              id="tarjeta"
-              value={tarjeta}
-              onChange={(e) => setTarjeta(e.target.value)}
-              required
-              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        )}
+        <div>
+          <label htmlFor="productoOTarjeta" className="block text-sm font-medium text-gray-700">
+            {tipoDescuento === 'PRODUCTO' ? 'Producto:' : 'Tarjeta:'}
+          </label>
+          <input
+            type="text"
+            id="productoOTarjeta"
+            value={productoOTarjeta}
+            onChange={(e) => setProductoOTarjeta(e.target.value)}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+        </div>
+        <div>
+          <label htmlFor="porcentaje" className="block text-sm font-medium text-gray-700">Porcentaje:</label>
+          <input
+            type="number"
+            id="porcentaje"
+            value={porcentaje}
+            onChange={(e) => setPorcentaje(e.target.value)}
+            required
+            min="0"
+            max="100"
+            step="0.01"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+        </div>
         <div>
           <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700">Fecha de Inicio:</label>
           <input
@@ -94,7 +103,7 @@ function CreateDescuentoForm() {
             value={fechaInicio}
             onChange={(e) => setFechaInicio(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
         <div>
@@ -105,35 +114,14 @@ function CreateDescuentoForm() {
             value={fechaFin}
             onChange={(e) => setFechaFin(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
-        <div>
-          <label htmlFor="porcentaje" className="block text-sm font-medium text-gray-700">Porcentaje de Descuento:</label>
-          <input
-            type="number"
-            id="porcentaje"
-            value={porcentaje}
-            onChange={(e) => setPorcentaje(e.target.value)}
-            required
-            min="0"
-            max="100"
-            step="0.01"
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-        <button 
-          type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
+        <button type="submit" className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-300">
           Crear Descuento
         </button>
       </form>
-      {message && (
-        <p className="mt-4 text-sm text-center" style={{ color: message.includes('éxito') ? 'green' : 'red' }}>
-          {message}
-        </p>
-      )}
+      {message && <p className="mt-4 text-sm text-center" style={{ color: message.includes('éxito') ? 'green' : 'red' }}>{message}</p>}
     </div>
   );
 }

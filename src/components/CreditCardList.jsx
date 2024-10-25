@@ -1,19 +1,21 @@
-// CreditCardList.js
 import React from 'react';
 
 function CreditCardList({ cards, onSelect }) {
   const handleChange = (event) => {
-    onSelect(event.target.value);
+    onSelect(parseInt(event.target.value, 10));
   };
 
   return (
     <div>
-      <h2>Tarjetas de crédito</h2>
-      <select onChange={handleChange}>
+      <h2 className="text-xl font-semibold mb-4">Tarjeta de crédito</h2>
+      <select 
+        onChange={handleChange}
+        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+      >
         <option value="">Seleccione una tarjeta</option>
         {cards.map(card => (
           <option key={card.id} value={card.id}>
-            {card.numero} - {card.nombre}
+            {card.numero} - {card.tipoTarjeta}
           </option>
         ))}
       </select>

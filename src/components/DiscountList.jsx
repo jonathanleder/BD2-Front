@@ -1,26 +1,16 @@
-// DiscountList.js
 import React from 'react';
 
 function DiscountList({ discounts }) {
   return (
     <div>
-      <h2>Descuentos vigentes</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Descripción</th>
-            <th>Porcentaje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {discounts.map(discount => (
-            <tr key={discount.id}>
-              <td>{discount.descripcion}</td>
-              <td>{discount.porcentaje}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h2 className="text-xl font-semibold mb-4">Descuentos vigentes</h2>
+      <div className="bg-gray-50 rounded-md p-4 max-h-48 overflow-y-auto">
+        {discounts.map(discount => (
+          <p key={discount.id} className="text-sm text-gray-600 mb-2">
+            {discount.descripcion}: <span className="font-medium text-gray-800">{discount.descuento * 100}%</span>
+          </p>
+        ))}
+      </div>
     </div>
   );
 }
