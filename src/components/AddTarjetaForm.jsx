@@ -7,16 +7,17 @@ function AddTarjetaForm({ clientId, onTarjetaAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("el id del cliente es: "+clientId)
     try {
-      const response = await fetch('http://localhost:8080/clientes/agregar-tarjeta', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:8080/clientes/agregar-tarjeta/${clientId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          clienteId: clientId,
+        
           numero,
-          tipo
+          tipoTarjeta: tipo,
         }),
       });
 

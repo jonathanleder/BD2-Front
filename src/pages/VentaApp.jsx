@@ -142,7 +142,7 @@ function VentaApp() {
   const filteredDiscounts = discounts.length > 0 && selectedProducts.length > 0
     ? discounts.filter(discount => selectedProducts.includes(discount.productId))
     : [];
-    
+    console.table(products);
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-7xl mx-auto">

@@ -1,10 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ProductList({ products, onSelect }) {
+  const navigate = useNavigate();
+
   const handleChange = (event) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => parseInt(option.value, 10));
     onSelect(selectedOptions);
   };
+
+  const handleEditClick = (productId) => {
+    if (productId) {
+        navigate(`/modificar-producto/${productId}`);
+    }
+};
+
 
   return (
     <div>
@@ -20,6 +30,20 @@ function ProductList({ products, onSelect }) {
           </option>
         ))}
       </select>
+      
+      <div className="mt-4 space-y-2">
+        {products.map(product => (
+          <div key={product.id} className="flex items-center justify-between">
+            <span>{product.descripcion} - ${product.precio.toFixed(2)}</span>
+            <button
+              onClick={() => handleEditClick(product.id)}
+              className="text-white bg-indigo-500 px-3 py-1 rounded-md hover:bg-indigo-600"
+            >
+              Editar
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

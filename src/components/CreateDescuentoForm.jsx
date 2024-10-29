@@ -15,7 +15,7 @@ function CreateDescuentoForm({ onDescuentoCreated }) {
         fechaInicio,
         fechaFin,
         porcentaje: parseFloat(porcentaje),
-        descripcion: productoOTarjeta,
+        marca: productoOTarjeta,
       };
 
       let url = '';
